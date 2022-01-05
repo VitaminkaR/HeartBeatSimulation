@@ -50,8 +50,7 @@ HBSimGame.WIDTH / HBSimGame.HEIGHT,
                 }
                 catch
                 {
-                }
-                    
+                } 
             }
         }
 

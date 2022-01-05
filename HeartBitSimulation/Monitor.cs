@@ -6,15 +6,17 @@ namespace HeartBitSimulation
 {
     class Monitor
     {
-        public const float GRAPH_SPEED = 0.1f; // на сколько будет сдвигатся
-        public const int GRAPH_UPDATE = 100; // 0.1 sec, работа таймера(период)
+        public const float GRAPH_SPEED = 0.01f; // на сколько будет сдвигатся
+        public const int GRAPH_UPDATE = 5; // var/1000 sec, работа таймера(период)
+
+        private Mutex mutex = new Mutex();
 
         // движение графа
         private TimerCallback graphUpdate;
         private Timer timer;
 
         // переменная электрического импульса
-        public float electricImpulse;
+        private float electricImpulse;
 
         // доступ к рисованию
         Graphics graphics;
@@ -39,6 +41,7 @@ namespace HeartBitSimulation
 
         private void GraphUpdate(object obj)
         {
+            mutex.WaitOne();
             if (graphics.VNotNull())
             {
                 Vector3 v_position = graphics.GetLastVertex().Position;
@@ -50,6 +53,12 @@ namespace HeartBitSimulation
                     NewGraph();
                 }
             }
+            mutex.ReleaseMutex();
+        }
+
+        public void SetImpulse(float impulse)
+        {
+            electricImpulse = impulse;
         }
     }
 }
