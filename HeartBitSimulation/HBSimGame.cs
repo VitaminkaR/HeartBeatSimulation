@@ -57,21 +57,6 @@ namespace HeartBitSimulation
                 Exit();
 
             var ks = Keyboard.GetState();
-            if (ks.IsKeyDown(Keys.Up))
-                heart.ChangeHR(heart.heartRate + 1);
-            if (ks.IsKeyDown(Keys.Down))
-                heart.ChangeHR(heart.heartRate - 1);
-
-            if (ks.IsKeyDown(Keys.D0))
-                heart.state = 0;
-            if (ks.IsKeyDown(Keys.D1))
-                heart.state = 1;
-            if (ks.IsKeyDown(Keys.D2))
-                heart.state = 2;
-            if (ks.IsKeyDown(Keys.D3))
-                heart.state = 3;
-            if (ks.IsKeyDown(Keys.D4))
-                heart.Diffibrillator();
 
             base.Update(gameTime);
         }
