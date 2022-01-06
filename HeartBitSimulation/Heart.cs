@@ -30,18 +30,20 @@ namespace HeartBitSimulation
         private void VentricleWork()
         {
             while (true)
-            {
+            { 
+                // QRS сокращение желудочков
                 Thread.Sleep(75 + TranslateToMiliseconds(heartRate));
                 mutex.WaitOne();
-                monitor.SetImpulse(-0.4f);
+                monitor.SetImpulse(-0.4f + (float)(new Random().NextDouble() / 50));
                 Thread.Sleep(25);
-                monitor.SetImpulse(0.75f);
+                monitor.SetImpulse(0.75f + (float)(new Random().NextDouble() / 50));
                 Thread.Sleep(25);
-                monitor.SetImpulse(-0.3f);
+                monitor.SetImpulse(-0.3f + (float)(new Random().NextDouble() / 50));
                 Thread.Sleep(25);
                 monitor.SetImpulse(0f);
-                Thread.Sleep(50);
-                monitor.SetImpulse(0.3f);
+                // T расслабление желудочков
+                Thread.Sleep(100);
+                monitor.SetImpulse(0.3f + (float)(new Random().NextDouble() / 50));
                 Thread.Sleep(25);
                 monitor.SetImpulse(0f);
                 mutex.ReleaseMutex();
@@ -52,13 +54,14 @@ namespace HeartBitSimulation
         {
             while (true)
             {
+                // P сокращение предсердий
                 mutex.WaitOne();
                 Thread.Sleep(TranslateToMiliseconds(heartRate));
-                monitor.SetImpulse(0.2f);
+                monitor.SetImpulse(0.2f + (float)(new Random().NextDouble() / 50));
                 Thread.Sleep(25);
                 monitor.SetImpulse(0f);
+                Thread.Sleep(100);
                 mutex.ReleaseMutex();
-                Thread.Sleep(175);
             }
         }
 
