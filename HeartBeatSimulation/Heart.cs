@@ -6,6 +6,10 @@ namespace HeartBitSimulation
 {
     class Heart
     {
+        // оклонение для рандоматизации показателя чсс. на n * 2 относительно центра(начального сердцебиения(80 - offset))
+        const int HEART_DEVIATION = 5;
+
+        // популярные сердечные ритмы
         public enum Rythms
         {
             sinusRhythm,
@@ -16,24 +20,30 @@ namespace HeartBitSimulation
             asystole,
         }
 
-
         // сокращения
         private Thread ventricleThread;
         private Thread atrialThread;
         private Mutex mutex = new Mutex();
 
         public Monitor monitor;
+        private Random rand;
 
         //// основные переменные сердца
         // частота сердченых сокращений ms
         public int heartRate;
+        // ритм сердца
         public Rythms heartState;
+        // значение разницы чсс от нормального выского уровня для рандоматизации(индивидуальности) чсс
+        public int heartOffset;
 
         public Heart(Monitor _monitor)
         {
-            heartRate = 75;
-            heartState = Rythms.sinusRhythm;
+            rand = new Random();
             monitor = _monitor;
+
+            heartOffset = rand.Next(0, 21);
+            heartRate = 80 - heartOffset;
+            heartState = Rythms.sinusRhythm;
 
             ventricleThread = new Thread(new ThreadStart(VentricleWork));
             atrialThread = new Thread(new ThreadStart(AtrialWork));
@@ -48,6 +58,8 @@ namespace HeartBitSimulation
                 // синусовый ритм
                 if (heartState == Rythms.sinusRhythm)
                 {
+                    HeartDeviation();
+
                     // QRS сокращение желудочков
                     Thread.Sleep(75 + TranslateToMiliseconds(heartRate));
                     mutex.WaitOne();
@@ -69,6 +81,8 @@ namespace HeartBitSimulation
                 // аритмия
                 if (heartState == Rythms.arrhythmia)
                 {
+                    HeartDeviation();
+
                     // QRS сокращение желудочков
                     Thread.Sleep(75 + TranslateToMiliseconds(heartRate) + new Random().Next(-400, 400));
                     mutex.WaitOne();
@@ -90,6 +104,8 @@ namespace HeartBitSimulation
                 // мерцательная аритмия
                 if (heartState == Rythms.atrialFibrillation)
                 {
+                    HeartDeviation();
+
                     // QRS сокращение желудочков
                     Thread.Sleep(75 + TranslateToMiliseconds(heartRate));
                     mutex.WaitOne();
@@ -111,6 +127,8 @@ namespace HeartBitSimulation
                 // крупноволновая фибрилляция желудочков
                 if (heartState == Rythms.coarseVentricularFibrillation)
                 {
+                    HeartDeviation();
+
                     // сокращение желудочков
                     mutex.WaitOne();
                     monitor.SetImpulse(0.5f + (float)(new Random().Next(-10,10)) / 50);
@@ -126,12 +144,16 @@ namespace HeartBitSimulation
                 // мелковолновая фибрилляция желудочоков
                 if (heartState == Rythms.ventricularFibrillation)
                 {
+                    HeartDeviation();
+
                     // сокращение желудочков
                     mutex.WaitOne();
                     monitor.SetImpulse((float)(new Random().NextDouble() / (400 / heartRate)) * new Random().Next(-1,2));
                     Thread.Sleep(25);
                     monitor.SetImpulse(0f);
                 }
+
+                Thread.Sleep(1);
             }
         }
 
@@ -177,6 +199,17 @@ namespace HeartBitSimulation
                     Thread.Sleep(100);
                     mutex.ReleaseMutex();
                 }
+
+                Thread.Sleep(1);
+            }
+        }
+
+        private void HeartDeviation()
+        {
+            int bHeartRate = 80 - heartOffset;
+            if(heartState == Rythms.sinusRhythm)
+            {
+                heartRate = rand.Next(bHeartRate - HEART_DEVIATION, bHeartRate + HEART_DEVIATION);
             }
         }
 
