@@ -5,6 +5,17 @@ namespace HeartBitSimulation
 {
     class Heart
     {
+        public enum Rythms
+        {
+            sinusRhythm,
+            arrhythmia,
+            atrialFibrillation,
+            coarseVentricularFibrillation,
+            ventricularFibrillation,
+            asystole,
+        }
+
+
         // сокращения
         private Thread ventricleThread;
         private Thread atrialThread;
@@ -15,10 +26,12 @@ namespace HeartBitSimulation
         //// основные переменные сердца
         // частота сердченых сокращений ms
         public int heartRate;
+        public Rythms heartState;
 
         public Heart(Monitor _monitor)
         {
             heartRate = 75;
+            heartState = Rythms.sinusRhythm;
             monitor = _monitor;
 
             ventricleThread = new Thread(new ThreadStart(VentricleWork));
@@ -30,23 +43,27 @@ namespace HeartBitSimulation
         private void VentricleWork()
         {
             while (true)
-            { 
-                // QRS сокращение желудочков
-                Thread.Sleep(75 + TranslateToMiliseconds(heartRate));
-                mutex.WaitOne();
-                monitor.SetImpulse(-0.4f + (float)(new Random().NextDouble() / 50));
-                Thread.Sleep(25);
-                monitor.SetImpulse(0.75f + (float)(new Random().NextDouble() / 50));
-                Thread.Sleep(25);
-                monitor.SetImpulse(-0.3f + (float)(new Random().NextDouble() / 50));
-                Thread.Sleep(25);
-                monitor.SetImpulse(0f);
-                // T расслабление желудочков
-                Thread.Sleep(100);
-                monitor.SetImpulse(0.3f + (float)(new Random().NextDouble() / 50));
-                Thread.Sleep(25);
-                monitor.SetImpulse(0f);
-                mutex.ReleaseMutex();
+            {
+                // синусовый ритм
+                if (heartState == Rythms.sinusRhythm)
+                {
+                    // QRS сокращение желудочков
+                    Thread.Sleep(75 + TranslateToMiliseconds(heartRate));
+                    mutex.WaitOne();
+                    monitor.SetImpulse(-0.4f + (float)(new Random().NextDouble() / 50));
+                    Thread.Sleep(25);
+                    monitor.SetImpulse(0.75f + (float)(new Random().NextDouble() / 50));
+                    Thread.Sleep(25);
+                    monitor.SetImpulse(-0.3f + (float)(new Random().NextDouble() / 50));
+                    Thread.Sleep(25);
+                    monitor.SetImpulse(0f);
+                    // T расслабление желудочков
+                    Thread.Sleep(100);
+                    monitor.SetImpulse(0.3f + (float)(new Random().NextDouble() / 50));
+                    Thread.Sleep(25);
+                    monitor.SetImpulse(0f);
+                    mutex.ReleaseMutex();
+                }
             }
         }
 
@@ -54,14 +71,18 @@ namespace HeartBitSimulation
         {
             while (true)
             {
-                // P сокращение предсердий
-                mutex.WaitOne();
-                Thread.Sleep(TranslateToMiliseconds(heartRate));
-                monitor.SetImpulse(0.2f + (float)(new Random().NextDouble() / 50));
-                Thread.Sleep(25);
-                monitor.SetImpulse(0f);
-                Thread.Sleep(100);
-                mutex.ReleaseMutex();
+                // синусовый ритм
+                if (heartState == Rythms.sinusRhythm)
+                {
+                    // P сокращение предсердий
+                    mutex.WaitOne();
+                    Thread.Sleep(TranslateToMiliseconds(heartRate));
+                    monitor.SetImpulse(0.2f + (float)(new Random().NextDouble() / 50));
+                    Thread.Sleep(25);
+                    monitor.SetImpulse(0f);
+                    Thread.Sleep(100);
+                    mutex.ReleaseMutex();
+                }
             }
         }
 
