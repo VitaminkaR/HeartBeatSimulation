@@ -58,6 +58,10 @@ namespace HeartBitSimulation
 
             var ks = Keyboard.GetState();
 
+
+            heart.Debug(ks);
+            heart.Update();
+
             base.Update(gameTime);
         }
 
@@ -67,8 +71,10 @@ namespace HeartBitSimulation
 
             graphics.Draw();
 
+            string info = heart.heartState.ToString() + " State\n";
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, heart.heartRate.ToString() + " /BPM", new Vector2(0, 0), Color.Green);
+            _spriteBatch.DrawString(font, heart.heartRate.ToString(), new Vector2(WIDTH - 256, 0), Color.Green, 0, Vector2.Zero, 4, SpriteEffects.None, 0);
+            _spriteBatch.DrawString(font, info, new Vector2(0, 0), Color.Green);
             _spriteBatch.End();
 
             base.Draw(gameTime);
