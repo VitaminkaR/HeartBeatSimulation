@@ -16,6 +16,7 @@ namespace HeartBitSimulation
         static internal Graphics graphics;
         static internal Monitor monitor;
         static internal Heart heart;
+        static internal RateMeter meter;
 
         // font
         SpriteFont font;
@@ -40,6 +41,8 @@ namespace HeartBitSimulation
             monitor.Init();
 
             heart = new Heart(monitor);
+
+            meter = new RateMeter(heart);
 
             base.Initialize();
         }
@@ -71,9 +74,13 @@ namespace HeartBitSimulation
 
             graphics.Draw();
 
-            string info = heart.heartState.ToString() + " State\n";
+            string info = heart.heartState.ToString() + " State\n" + heart.heartDamage.ToString() + " Damage\n" + "Heart work - " + !heart.isDeath;
             _spriteBatch.Begin();
-            _spriteBatch.DrawString(font, heart.heartRate.ToString(), new Vector2(WIDTH - 256, 0), Color.Green, 0, Vector2.Zero, 4, SpriteEffects.None, 0);
+            if(heart.heartRate > 20)
+                _spriteBatch.DrawString(font, meter.GetRate(), new Vector2(WIDTH - 256, 0), Color.Green, 0, Vector2.Zero, 4, SpriteEffects.None, 0);
+            else
+                _spriteBatch.DrawString(font, meter.GetRate(), new Vector2(WIDTH - 256, 0), Color.Green, 0, Vector2.Zero, 4, SpriteEffects.None, 0);
+
             _spriteBatch.DrawString(font, info, new Vector2(0, 0), Color.Green);
             _spriteBatch.End();
 

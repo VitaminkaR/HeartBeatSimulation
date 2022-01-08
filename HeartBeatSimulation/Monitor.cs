@@ -53,6 +53,8 @@ namespace HeartBitSimulation
                     NewGraph();
                 }
             }
+
+            HBSimGame.meter?.Update();
             mutex.ReleaseMutex();
         }
 
